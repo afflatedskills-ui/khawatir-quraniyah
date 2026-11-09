@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Khawatir Quraniyah — Book Reader</title>
+<style>
+  :root{
+    --fs:18px;
+    --bg:#f6f3ea; --fg:#29251c; --enfg:#5f5747; --faint:#8f8674;
+    --line:#ddd4c1; --accent:#8a6d1f;
+    --btn:#fffdf8; --btnbd:#cfc4ad;
+    color-scheme:light;
+  }
+  :root[data-theme="dark"]{
+    --bg:#14110d; --fg:#e9e3d3; --enfg:#bfb59d; --faint:#7d7360;
+    --line:#38322a; --accent:#d9b45c;
+    --btn:#201c15; --btnbd:#4c4436;
+    color-scheme:dark;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);
+    font:var(--fs)/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;}
+  .top{position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;
+    padding:.45rem .6rem;background:var(--bg);border-bottom:1px solid var(--line);}
+  .home{color:var(--faint);text-decoration:none;font-size:1.2rem;line-height:1;padding:.15rem .35rem;border-radius:6px}
+  .home:hover{color:var(--fg);background:var(--btn)}
+  .navbtns{display:flex;gap:.25rem}
+  #surah{flex:1 1 11rem;min-width:0;font:inherit;font-size:.92rem;padding:.35rem .5rem;
+    border:1px solid var(--btnbd);border-radius:8px;background:var(--btn);color:var(--fg)}
+  button{font:inherit;font-size:.85rem;cursor:pointer;border:1px solid var(--btnbd);
+    border-radius:8px;background:var(--btn);color:var(--fg);padding:.32rem .6rem;line-height:1.2}
+  button:hover:not(:disabled){border-color:var(--accent)}
+  button:disabled{opacity:.35;cursor:default}
+  main{max-width:42rem;margin:0 auto;padding:1.6rem 1.2rem 5rem}
+  .surahhead{margin:0 0 1.3rem;padding-bottom:1rem;border-bottom:1px solid var(--line)}
+  .surahhead h1{margin:0;font-size:1.3rem;font-weight:650;line-height:1.6}
+  .note{margin:.45rem 0 0;font-size:.82rem;font-style:italic;color:var(--faint);line-height:1.5}
+  .pairs{margin-top:1.3rem}
+  .pair{margin:0 0 1.8rem}
+  .pair .ar{font-family:"Amiri","Noto Naskh Arabic","Scheherazade New",serif;
+    font-size:1.15em;line-height:2.05;color:var(--fg);margin:0 0 .5rem;overflow-wrap:break-word}
+  .entext{border-inline-start:2px solid var(--line);padding-inline-start:.9rem;margin-top:.15rem}
+  .pair .en{font-family:Georgia,"Iowan Old Style","Times New Roman",serif;font-size:.95em;
+    line-height:1.75;color:var(--enfg);margin:0 0 .45rem;overflow-wrap:break-word}
+  .entext p:last-child{margin-bottom:0}
+  /* en-only pair: no accent rail, text runs full column width */
+  .pair>.entext:only-child{border-inline-start:0;padding-inline-start:0;margin-top:0}
+  .empty{margin:2.5rem 0;text-align:center;color:var(--faint);font-size:1rem}
+  .status{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;gap:.8rem;
+    align-items:center;justify-content:center;background:var(--bg);color:var(--faint);
+    padding:2rem;text-align:center}
+  .status p{margin:0}
+  .status button{margin-top:.4rem}
+  @media (max-width:560px){
+    .surahhead h1{font-size:1.15rem}
+    #surah{font-size:.85rem}
+  }
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="home" href="../" title="Back to index" aria-label="Back to index">&#8249;</a>
+  <div class="navbtns">
+    <button id="prev" type="button" disabled aria-label="Previous surah">&#8249;</button>
+    <button id="next" type="button" disabled aria-label="Next surah">&#8250;</button>
+  </div>
+  <select id="surah" aria-label="Choose surah" disabled><option>Loading&#8230;</option></select>
+  <button id="fsDown" type="button" title="Decrease font size">A−</button>
+  <button id="fsUp" type="button" title="Increase font size">A+</button>
+  <button id="theme" type="button" title="Toggle light/dark theme">Light</button>
+</header>
+<main id="main"></main>
+<div class="status" id="status" role="status">Loading&#8230;</div>
+<noscript><p style="padding:1rem">This reader requires JavaScript.</p></noscript>
+<script>
+(function () {
+  'use strict';
+
+  function $(id) { return document.getElementById(id); }
+
+  var sel = $('surah'), prevBtn = $('prev'), nextBtn = $('next');
+  var fsDown = $('fsDown'), fsUp = $('fsUp'), themeBtn = $('theme');
+  var main = $('main'), status = $('status');
+
+  var FS_MIN = 15, FS_MAX = 26, FS_STEP = 1;
+
+  var prefs = { fs: 18, theme: '', surah: 1 };
+  try {
+    var saved = JSON.parse(localStorage.getItem('kq-book') || '{}');
+    if (typeof saved.fs === 'number') prefs.fs = saved.fs;
+    if (saved.theme === 'light' || saved.theme === 'dark') prefs.theme = saved.theme;
+    if (typeof saved.surah === 'number' && saved.surah >= 1 && saved.surah <= 114) prefs.surah = saved.surah;
+  } catch (e) {}
+
+  var book = null;   // {surahs, byN, order}
+  var current = 1;   // surah number
+
+  function savePrefs() {
+    try { localStorage.setItem('kq-book', JSON.stringify(prefs)); } catch (e) {}
+  }
+
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;   // textContent: data contains <, >, &
+    return e;
+  }
+
+  /* ---------- surah rendering ---------- */
+
+  function renderPair(pair) {
+    var d = el('div', 'pair'), ar = pair.ar || [], en = pair.en || [], i, p;
+    for (i = 0; i < ar.length; i++) {
+      p = el('p', 'ar', ar[i]);
+      p.setAttribute('dir', 'rtl');
+      p.setAttribute('lang', 'ar');
+      d.appendChild(p);
+    }
+    if (en.length) {
+      var ew = el('div', 'entext');
+      for (i = 0; i < en.length; i++) ew.appendChild(el('p', 'en', en[i]));
+      d.appendChild(ew);
+    }
+    return d;
+  }
+
+  function render() {
+    if (!book) return;
+    var s = book.byN[current];
+    if (!s && book.surahs.length) { current = book.surahs[0].n; s = book.surahs[0]; }
+    if (!s) return;
+
+    var frag = document.createDocumentFragment();
+    var head = el('header', 'surahhead'), h = el('h1');
+    h.appendChild(document.createTextNode(s.n + '. '));
+    var nm = el('span', null, s.nameAr);
+    nm.setAttribute('dir', 'rtl');
+    nm.setAttribute('lang', 'ar');
+    h.appendChild(nm);
+    h.appendChild(document.createTextNode(' — ' + s.nameEn));
+    head.appendChild(h);
+    frag.appendChild(head);
+
+    if (s.notCovered) {
+      frag.appendChild(el('p', 'empty',
+        'Surah ' + s.n + ' (' + s.nameEn + ') is not covered in this edition.'));
+    } else {
+      var note = null;
+      if (s.enOnly) note = 'This edition has no dedicated Arabic section for this surah — English text shown.';
+      else if (s.fallback) note = 'Paragraph alignment in this edition is approximate.';
+      if (note) frag.appendChild(el('p', 'note', note));
+      var pairs = s.pairs || [];
+      if (!pairs.length) {
+        frag.appendChild(el('p', 'empty', 'No text available for this surah in this edition.'));
+      } else {
+        var wrap = el('div', 'pairs');
+        for (var i = 0; i < pairs.length; i++) wrap.appendChild(renderPair(pairs[i]));
+        frag.appendChild(wrap);
+      }
+    }
+
+    main.textContent = '';
+    main.appendChild(frag);
+    document.title = s.n + '. ' + s.nameEn + ' — Khawatir Quraniyah';
+    window.scrollTo(0, 0);
+    updateNav();
+  }
+
+  function updateNav() {
+    if (!book) { prevBtn.disabled = nextBtn.disabled = true; return; }
+    var i = book.order.indexOf(current);
+    prevBtn.disabled = i <= 0;
+    nextBtn.disabled = i < 0 || i >= book.order.length - 1;
+  }
+
+  function go(n) {
+    current = n;
+    sel.value = String(n);
+    prefs.surah = n;
+    savePrefs();
+    render();
+  }
+
+  function step(d) {
+    if (!book) return;
+    var i = book.order.indexOf(current), j = i + d;
+    if (j < 0 || j >= book.order.length) return;
+    go(book.order[j]);
+  }
+
+  /* ---------- surah select ---------- */
+
+  function buildSelect() {
+    sel.innerHTML = '';
+    for (var i = 0; i < book.surahs.length; i++) {
+      var s = book.surahs[i], o = document.createElement('option');
+      o.value = String(s.n);
+      o.textContent = s.n + '. ' + s.nameAr + ' — ' + s.nameEn;
+      sel.appendChild(o);
+    }
+    sel.disabled = false;
+  }
+
+  /* ---------- prefs: font size + theme ---------- */
+
+  function systemTheme() {
+    return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+  }
+
+  function applyTheme(t, remember) {
+    document.documentElement.setAttribute('data-theme', t);
+    themeBtn.textContent = t === 'dark' ? 'Dark' : 'Light';
+    themeBtn.setAttribute('aria-pressed', String(t === 'dark'));
+    if (remember) { prefs.theme = t; savePrefs(); }
+  }
+
+  function applyPrefs() {
+    document.documentElement.style.setProperty('--fs', prefs.fs + 'px');
+    fsDown.disabled = prefs.fs <= FS_MIN;
+    fsUp.disabled = prefs.fs >= FS_MAX;
+    applyTheme(prefs.theme || systemTheme(), false);
+  }
+
+  themeBtn.addEventListener('click', function () {
+    applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark', true);
+  });
+  if (window.matchMedia) {
+    var mq = window.matchMedia('(prefers-color-scheme: dark)');
+    var mqHandler = function (e) { if (!prefs.theme) applyTheme(e.matches ? 'dark' : 'light', false); };
+    if (mq.addEventListener) mq.addEventListener('change', mqHandler);
+    else if (mq.addListener) mq.addListener(mqHandler);
+  }
+  fsDown.addEventListener('click', function () {
+    if (prefs.fs > FS_MIN) { prefs.fs -= FS_STEP; applyPrefs(); savePrefs(); }
+  });
+  fsUp.addEventListener('click', function () {
+    if (prefs.fs < FS_MAX) { prefs.fs += FS_STEP; applyPrefs(); savePrefs(); }
+  });
+
+  /* ---------- nav events ---------- */
+
+  sel.addEventListener('change', function () { go(Number(sel.value)); });
+  prevBtn.addEventListener('click', function () { step(-1); });
+  nextBtn.addEventListener('click', function () { step(1); });
+
+  /* ---------- load data ---------- */
+
+  function showError() {
+    status.textContent = '';
+    status.appendChild(el('p', null, 'Could not load the book data. Check your connection and try again.'));
+    var b = el('button', null, 'Retry');
+    b.type = 'button';
+    b.addEventListener('click', init);
+    status.appendChild(b);
+  }
+
+  function init() {
+    status.textContent = 'Loading…';
+    fetch('../data/book.json').then(function (r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    }).then(function (json) {
+      book = { surahs: json.surahs || [], byN: {}, order: [] };
+      for (var i = 0; i < book.surahs.length; i++) {
+        var s = book.surahs[i];
+        book.byN[s.n] = s;
+        book.order.push(s.n);
+      }
+      buildSelect();
+      applyPrefs();
+      go(book.byN[prefs.surah] ? prefs.surah : 1);
+      status.parentNode.removeChild(status);
+    }).catch(showError);
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Khawatir Quraniyah — Text Reader</title>
+<style>
+  :root{
+    --fs:18px;
+    --bg:#f5f2ea; --pane:#fffdf7; --fg:#262219; --head:#7a7264;
+    --border:#ddd5c4; --btn:#ffffff; --btnbd:#cfc6b0;
+    --accent:#8a6d1f; --accentfg:#fffdf7; --msg:#8d8574;
+    color-scheme:light;
+  }
+  :root[data-theme="dark"]{
+    --bg:#14120f; --pane:#1d1a15; --fg:#e9e4d6; --head:#a2977f;
+    --border:#38322a; --btn:#262119; --btnbd:#4c4436;
+    --accent:#d9b45c; --accentfg:#191407; --msg:#948b77;
+    color-scheme:dark;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;background:var(--bg);color:var(--fg);
+    font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    display:flex;flex-direction:column;height:100vh;height:100dvh;
+  }
+  .top{
+    display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;
+    padding:.45rem .6rem;background:var(--pane);border-bottom:1px solid var(--border);
+  }
+  .home{color:var(--head);text-decoration:none;font-size:1.15rem;line-height:1;padding:.15rem .35rem;border-radius:6px}
+  .home:hover{color:var(--fg);background:var(--btn)}
+  .navbtns{display:flex;gap:.25rem}
+  #surah{flex:1 1 10rem;min-width:0;font:inherit;font-size:16px;padding:.35rem .5rem;border:1px solid var(--btnbd);border-radius:8px;background:var(--btn);color:var(--fg)}
+  .controls{
+    display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;
+    padding:.4rem .6rem;background:var(--pane);border-bottom:1px solid var(--border);
+  }
+  button{
+    font:inherit;font-size:.9rem;cursor:pointer;
+    border:1px solid var(--btnbd);border-radius:8px;
+    background:var(--btn);color:var(--fg);padding:.3rem .6rem;line-height:1.2;
+  }
+  button:hover{border-color:var(--accent)}
+  button:disabled{opacity:.35;cursor:default}
+  button.on{background:var(--accent);border-color:var(--accent);color:var(--accentfg)}
+  .controls .spacer{flex:1}
+  .langseg{display:none;gap:.3rem}
+  .langseg button{padding:.35rem .8rem}
+  .panes{position:relative;flex:1;min-height:0;display:flex}
+  .pane{flex:1;min-width:0;display:flex;flex-direction:column;background:var(--pane)}
+  .panehead{
+    display:flex;justify-content:space-between;align-items:baseline;gap:.6rem;flex-wrap:wrap;
+    padding:.4rem .8rem;border-bottom:1px solid var(--border);
+    font-size:.8rem;color:var(--head);
+  }
+  .pg{direction:ltr;unicode-bidi:isolate;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .scroll{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain}
+  .text{font-size:var(--fs);line-height:1.9;padding:1rem 1.15rem;white-space:pre-wrap;overflow-wrap:break-word}
+  #enPane .text{font-family:Georgia,"Iowan Old Style","Times New Roman",serif}
+  #arPane .text{
+    font-family:"Amiri","Noto Naskh Arabic","Noto Kufi Arabic","Scheherazade New","Traditional Arabic",serif;
+    line-height:2.05;
+  }
+  .text.msg{color:var(--msg);text-align:center;font-size:1rem;line-height:1.7;padding-top:4rem}
+  .divider{flex:none;width:1px;background:var(--border)}
+  .status{
+    position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:.8rem;
+    background:var(--bg);color:var(--head);padding:2rem;text-align:center;
+  }
+  .status p{margin:0}
+  .status button{margin-top:.4rem}
+  @media (max-width:760px){
+    .langseg{display:flex}
+    .divider{display:none}
+    .panes[data-view="ar"] #enPane{display:none}
+    .panes[data-view="en"] #arPane{display:none}
+  }
+</style>
+</head>
+<body>
+<header class="top">
+  <a class="home" href="../" title="Back to index" aria-label="Back to index">&#8249;</a>
+  <div class="navbtns">
+    <button id="prev" type="button" disabled aria-label="Previous">&#8249;</button>
+    <button id="next" type="button" disabled aria-label="Next">&#8250;</button>
+  </div>
+  <select id="surah" aria-label="Choose surah" disabled><option>Loading&#8230;</option></select>
+</header>
+<div class="controls">
+  <button id="fsDown" type="button" title="Decrease font size">A-</button>
+  <button id="fsUp" type="button" title="Increase font size">A+</button>
+  <button id="sync" type="button" class="on" aria-pressed="true" title="Toggle synced scrolling">Sync</button>
+  <button id="theme" type="button" title="Toggle light/dark theme">Light</button>
+  <span class="spacer"></span>
+  <div class="langseg" role="group" aria-label="Reading language">
+    <button id="viewAr" type="button">العربية</button>
+    <button id="viewEn" type="button">English</button>
+  </div>
+</div>
+<main class="panes" id="panes" data-view="ar">
+  <section class="pane" id="enPane" dir="ltr" lang="en">
+    <header class="panehead"><span class="pname" id="enName"></span><span class="pg" id="enPg"></span></header>
+    <div class="scroll" id="enScroll"><div class="text" id="enText"></div></div>
+  </section>
+  <div class="divider" aria-hidden="true"></div>
+  <section class="pane" id="arPane" dir="rtl" lang="ar">
+    <header class="panehead"><span class="pname" id="arName"></span><span class="pg" id="arPg"></span></header>
+    <div class="scroll" id="arScroll"><div class="text" id="arText"></div></div>
+  </section>
+  <div class="status" id="status">Loading&#8230;</div>
+</main>
+<noscript><p style="padding:1rem">This reader requires JavaScript.</p></noscript>
+<script>
+(function () {
+  'use strict';
+
+  function $(id) { return document.getElementById(id); }
+
+  var sel = $('surah'), prevBtn = $('prev'), nextBtn = $('next');
+  var fsDown = $('fsDown'), fsUp = $('fsUp');
+  var syncBtn = $('sync'), themeBtn = $('theme');
+  var viewArBtn = $('viewAr'), viewEnBtn = $('viewEn');
+  var panes = $('panes'), status = $('status');
+
+  var FS_MIN = 14, FS_MAX = 26, FS_STEP = 1;
+
+  var prefs = { fs: 18, sync: true, theme: '', view: 'ar' };
+  try {
+    var saved = JSON.parse(localStorage.getItem('kq-reader') || '{}');
+    if (typeof saved.fs === 'number') prefs.fs = saved.fs;
+    if (typeof saved.sync === 'boolean') prefs.sync = saved.sync;
+    if (saved.theme === 'light' || saved.theme === 'dark') prefs.theme = saved.theme;
+    if (saved.view === 'ar' || saved.view === 'en') prefs.view = saved.view;
+  } catch (e) {}
+
+  var data = null;    // {surahs, byN, order, arIdx, enIdx, arBounds, enBounds}
+  var current = '1';  // select value: 'preface' or surah number as string
+
+  function savePrefs() {
+    try { localStorage.setItem('kq-reader', JSON.stringify(prefs)); } catch (e) {}
+  }
+
+  /* ---------- per-surah text assembly ---------- */
+
+  function cleanPage(t) {
+    return String(t == null ? '' : t)
+      .replace(/\r\n?/g, '\n')
+      .replace(/[ \t]+\n/g, '\n')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
+  }
+
+  function buildIndex(pages) {
+    var map = new Map(), last = 0;
+    for (var i = 0; i < pages.length; i++) {
+      var p = pages[i].p;
+      map.set(p, pages[i].t);
+      if (p > last) last = p;
+    }
+    return { map: map, last: last };
+  }
+
+  function boundsOf(surahs, key) {
+    var seen = {}, arr = [];
+    for (var i = 0; i < surahs.length; i++) {
+      var v = surahs[i][key];
+      if (v != null && !seen[v]) { seen[v] = 1; arr.push(v); }
+    }
+    arr.sort(function (a, b) { return a - b; });
+    return arr;
+  }
+
+  // smallest boundary value strictly greater than p, or null
+  function nextBoundary(sorted, p) {
+    var lo = 0, hi = sorted.length;
+    while (lo < hi) {
+      var mid = (lo + hi) >> 1;
+      if (sorted[mid] <= p) lo = mid + 1; else hi = mid;
+    }
+    return lo < sorted.length ? sorted[lo] : null;
+  }
+
+  // pages [startPage .. to]; 'to' is exclusive of the next surah's start page
+  function assemble(idx, bounds, startPage) {
+    var next = nextBoundary(bounds, startPage);
+    var to = next == null ? idx.last : next - 1;
+    var parts = [];
+    for (var p = startPage; p <= to; p++) {
+      var raw = idx.map.get(p);
+      if (raw == null) continue;
+      var c = cleanPage(raw);
+      if (c) parts.push(c);
+    }
+    return { text: parts.join('\n'), from: startPage, to: to };
+  }
+
+  function fmtRange(from, to) {
+    return from === to ? 'p. ' + from : 'pp. ' + from + '–' + to;
+  }
+
+  /* ---------- rendering ---------- */
+
+  var MSG = {
+    ar: 'لا يوجد قسم مخصص لهذه السورة في هذا الإصدار.',
+    en: 'No dedicated section in this edition.',
+    arEmpty: 'لا يوجد نص في هذا القسم.',
+    enEmpty: 'No text in this section.'
+  };
+
+  var PANES = {
+    en: { name: $('enName'), pg: $('enPg'), text: $('enText'), scroll: $('enScroll'), lang: 'en' },
+    ar: { name: $('arName'), pg: $('arPg'), text: $('arText'), scroll: $('arScroll'), lang: 'ar' }
+  };
+
+  function fillPane(pane, name, hasStart, sec) {
+    pane.name.textContent = name;
+    pane.pg.textContent = (hasStart && sec) ? fmtRange(sec.from, sec.to) : '—';
+    var txt, isMsg;
+    if (!hasStart) { txt = MSG[pane.lang]; isMsg = true; }
+    else if (!sec.text) { txt = pane.lang === 'ar' ? MSG.arEmpty : MSG.enEmpty; isMsg = true; }
+    else { txt = sec.text; isMsg = false; }
+    pane.text.textContent = txt;
+    pane.text.classList.toggle('msg', isMsg);
+    pane.scroll.scrollTop = 0;
+  }
+
+  function render() {
+    if (!data) return;
+    var isPref = current === 'preface';
+    var s = isPref ? null : data.byN[current];
+    var arStart = isPref ? 1 : (s ? s.arPage : null);
+    var enStart = isPref ? 1 : (s ? s.enPage : null);
+    var arSec = arStart == null ? null : assemble(data.arIdx, data.arBounds, arStart);
+    var enSec = enStart == null ? null : assemble(data.enIdx, data.enBounds, enStart);
+    fillPane(PANES.ar, isPref ? 'المقدمة' : s.nameAr, arStart != null, arSec);
+    fillPane(PANES.en, isPref ? 'Preface' : s.nameEn, enStart != null, enSec);
+    updateNav();
+  }
+
+  function updateNav() {
+    if (!data) { prevBtn.disabled = nextBtn.disabled = true; return; }
+    var i = data.order.indexOf(current);
+    prevBtn.disabled = i <= 0;
+    nextBtn.disabled = i < 0 || i >= data.order.length - 1;
+  }
+
+  function go(value) {
+    current = String(value);
+    sel.value = current;
+    render();
+  }
+
+  function step(d) {
+    if (!data) return;
+    var i = data.order.indexOf(current), j = i + d;
+    if (j < 0 || j >= data.order.length) return;
+    go(data.order[j]);
+  }
+
+  function buildSelect() {
+    sel.innerHTML = '';
+    var o = document.createElement('option');
+    o.value = 'preface';
+    o.textContent = 'المقدمة · Preface';
+    sel.appendChild(o);
+    for (var i = 0; i < data.surahs.length; i++) {
+      var s = data.surahs[i], op = document.createElement('option');
+      op.value = String(s.n);
+      op.textContent = s.n + '. ' + s.nameAr + ' — ' + s.nameEn;
+      sel.appendChild(op);
+    }
+    sel.disabled = false;
+  }
+
+  /* ---------- prefs: font size, theme, sync, mobile view ---------- */
+
+  function systemTheme() {
+    return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+  }
+
+  function applyTheme(t, remember) {
+    document.documentElement.setAttribute('data-theme', t);
+    themeBtn.textContent = t === 'dark' ? 'Dark' : 'Light';
+    themeBtn.setAttribute('aria-pressed', String(t === 'dark'));
+    if (remember) { prefs.theme = t; savePrefs(); }
+  }
+
+  function applyPrefs() {
+    document.documentElement.style.setProperty('--fs', prefs.fs + 'px');
+    fsDown.disabled = prefs.fs <= FS_MIN;
+    fsUp.disabled = prefs.fs >= FS_MAX;
+    panes.setAttribute('data-view', prefs.view);
+    viewArBtn.classList.toggle('on', prefs.view === 'ar');
+    viewEnBtn.classList.toggle('on', prefs.view === 'en');
+    syncBtn.classList.toggle('on', prefs.sync);
+    syncBtn.setAttribute('aria-pressed', String(prefs.sync));
+    applyTheme(prefs.theme || systemTheme(), false);
+  }
+
+  themeBtn.addEventListener('click', function () {
+    applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark', true);
+  });
+  if (window.matchMedia) {
+    var mq = window.matchMedia('(prefers-color-scheme: dark)');
+    var mqHandler = function (e) { if (!prefs.theme) applyTheme(e.matches ? 'dark' : 'light', false); };
+    if (mq.addEventListener) mq.addEventListener('change', mqHandler);
+    else if (mq.addListener) mq.addListener(mqHandler);
+  }
+  fsDown.addEventListener('click', function () {
+    if (prefs.fs > FS_MIN) { prefs.fs -= FS_STEP; applyPrefs(); savePrefs(); }
+  });
+  fsUp.addEventListener('click', function () {
+    if (prefs.fs < FS_MAX) { prefs.fs += FS_STEP; applyPrefs(); savePrefs(); }
+  });
+  syncBtn.addEventListener('click', function () {
+    prefs.sync = !prefs.sync; applyPrefs(); savePrefs();
+  });
+  viewArBtn.addEventListener('click', function () { prefs.view = 'ar'; applyPrefs(); savePrefs(); });
+  viewEnBtn.addEventListener('click', function () { prefs.view = 'en'; applyPrefs(); savePrefs(); });
+
+  /* ---------- synced scrolling ---------- */
+
+  var syncLock = false;
+  function bindSync(src, dst) {
+    src.addEventListener('scroll', function () {
+      if (!prefs.sync || syncLock) return;
+      var max = src.scrollHeight - src.clientHeight;
+      var dmax = dst.scrollHeight - dst.clientHeight;
+      if (max <= 0 || dmax <= 0) return;
+      var target = (src.scrollTop / max) * dmax;
+      if (Math.abs(dst.scrollTop - target) < 1) return;
+      syncLock = true;
+      dst.scrollTop = target;
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () { syncLock = false; });
+      });
+    }, { passive: true });
+  }
+  bindSync($('enScroll'), $('arScroll'));
+  bindSync($('arScroll'), $('enScroll'));
+
+  /* ---------- nav events ---------- */
+
+  sel.addEventListener('change', function () { go(sel.value); });
+  prevBtn.addEventListener('click', function () { step(-1); });
+  nextBtn.addEventListener('click', function () { step(1); });
+
+  /* ---------- load data ---------- */
+
+  function showError() {
+    status.textContent = '';
+    var p = document.createElement('p');
+    p.textContent = 'Could not load the book data. Check your connection and try again.';
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = 'Retry';
+    b.addEventListener('click', function () { location.reload(); });
+    status.appendChild(p);
+    status.appendChild(b);
+  }
+
+  function init() {
+    Promise.all([
+      fetch('../data/surahs.json'),
+      fetch('../data/ar.json'),
+      fetch('../data/en.json')
+    ]).then(function (rs) {
+      if (!rs[0].ok || !rs[1].ok || !rs[2].ok) throw new Error('HTTP error');
+      return Promise.all([rs[0].json(), rs[1].json(), rs[2].json()]);
+    }).then(function (jsons) {
+      var surahs = jsons[0];
+      var byN = {};
+      for (var i = 0; i < surahs.length; i++) byN[String(surahs[i].n)] = surahs[i];
+      var order = ['preface'];
+      for (var j = 0; j < surahs.length; j++) order.push(String(surahs[j].n));
+      data = {
+        surahs: surahs, byN: byN, order: order,
+        arIdx: buildIndex(jsons[1].pages),
+        enIdx: buildIndex(jsons[2].pages),
+        arBounds: boundsOf(surahs, 'arPage'),
+        enBounds: boundsOf(surahs, 'enPage')
+      };
+      buildSelect();
+      applyPrefs();
+      go('1');
+      status.parentNode.removeChild(status);
+    }).catch(showError);
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>

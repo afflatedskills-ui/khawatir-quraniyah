@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>خواطر قرآنية — Qur'anic Reflections · PDF</title>
+<style>
+  :root { color-scheme: light dark; }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body { margin: 0; font: 14px/1.4 system-ui, -apple-system, "Segoe UI", sans-serif;
+         background: #1e1e24; color: #eee; display: flex; flex-direction: column; overflow: hidden; }
+
+  header { flex: none; display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center;
+           padding: 8px 10px; background: #26262d; border-bottom: 1px solid #0007; }
+  .tt h1 { font-size: 15px; margin: 0; font-weight: 650; }
+  .tt .sub { font-size: 11px; color: #9a9aa5; }
+  .controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-left: auto; }
+  #surah { font: inherit; font-size: 13px; max-width: min(52vw, 430px); min-width: 160px;
+           padding: 4px 6px; border-radius: 8px; border: 1px solid #8887;
+           background: #33333b; color: #eee; }
+  button { font: inherit; font-size: 13px; padding: 4px 10px; border-radius: 8px;
+           border: 1px solid #8887; background: #38383f; color: #eee; cursor: pointer; }
+  button:hover:not(:disabled) { background: #46464f; }
+  button:disabled { opacity: .4; cursor: default; }
+  .sync { display: flex; gap: 5px; align-items: center; font-size: 12.5px;
+          color: #c9c9d2; white-space: nowrap; cursor: pointer; }
+  .views { display: flex; border: 1px solid #8887; border-radius: 8px; overflow: hidden; }
+  .views button { border: 0; border-radius: 0; padding: 4px 10px; background: transparent; }
+  .views button.on { background: #41618f; color: #fff; }
+
+  .stage { flex: 1; min-height: 0; display: flex; }
+  .pane { flex: 1; min-width: 0; min-height: 0; display: flex; flex-direction: column;
+          background: #2c2c33; position: relative; }
+  .bar { flex: none; height: 26px; display: flex; align-items: center; justify-content: space-between;
+         padding: 0 8px 0 12px; font-size: 12px; color: #a8a8b2; background: #22222a;
+         border-bottom: 1px solid #0006; }
+  .bar .lbl { display: flex; align-items: center; gap: 7px; }
+  .bar .pdf { color: #86aede; font-size: 11px; text-decoration: none; white-space: nowrap; }
+  .bar .pdf:hover { color: #cfe0f7; }
+  .bar .pgbar { display: flex; align-items: center; gap: 4px; }
+  .bar button { padding: 0 7px; font-size: 12px; line-height: 1.7; border-radius: 6px; }
+  .pg { min-width: 86px; text-align: center; font-variant-numeric: tabular-nums; }
+
+  .scroll { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden;
+            overscroll-behavior: contain; background: #3b3b43; }
+  .pages { max-width: 900px; margin: 0 auto; padding: 12px; }
+  .page { position: relative; background: #f8f5ec; margin: 0 auto 14px;
+          box-shadow: 0 1px 5px #0008; }
+  .page img { display: block; width: 100%; height: 100%; }
+  .page:not(.rendered) > img { visibility: hidden; }  /* hide until the image paints */
+  .page.err > img { display: none; }
+  .page.err::after { content: attr(data-pg); position: absolute; inset: 0;
+                     display: flex; align-items: center; justify-content: center;
+                     background: #e9e5d8; color: #9b968a; font-size: 12px; }
+  .badge { position: absolute; top: 5px; inset-inline-start: 7px; z-index: 2;
+           background: #000b; color: #fff; font: 10px/1.7 system-ui, sans-serif;
+           padding: 0 6px; border-radius: 8px; pointer-events: none; }
+  .spin { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+  .spin::before { content: ""; width: 26px; height: 26px; border: 3px solid #0002;
+                  border-top-color: #8a8a93; border-radius: 50%; animation: rot .8s linear infinite; }
+  @keyframes rot { to { transform: rotate(360deg); } }
+  .page.rendered .spin { display: none; }
+
+  .overlay { position: absolute; inset: 0; z-index: 5; display: flex; flex-direction: column;
+             gap: 14px; align-items: center; justify-content: center; padding: 20px;
+             background: #26262d; color: #cfcfda; font-size: 14px; text-align: center; }
+  .overlay .spin { position: static; display: flex; }
+  .overlay .spin::before { width: 36px; height: 36px; border-color: #ffffff26;
+                           border-top-color: #a9c6ff; }
+  .overlay.err { background: #2b1e22; color: #f2b8b8; }
+  .overlay.err .spin { display: none; }
+
+  .notice { position: absolute; top: 36px; left: 50%; transform: translateX(-50%); z-index: 6;
+            max-width: 92%; background: #000d; color: #fff; font-size: 12.5px;
+            padding: 6px 12px; border-radius: 8px; opacity: 0;
+            transition: opacity .25s; pointer-events: none; text-align: center; }
+  .notice.show { opacity: 1; }
+
+  .mode-ar #enPane, .mode-en #arPane { display: none; }
+
+  @media (max-width: 760px) {
+    .stage { flex-direction: column; }
+    #arPane { order: -1; }            /* stacked split: Arabic on top */
+    #surah { max-width: 56vw; }
+    .tt .sub { display: none; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="tt">
+    <h1>خواطر قرآنية — Qur'anic Reflections</h1>
+    <div class="sub">Amr Khaled · book pages · EN 356pp · AR 432pp</div>
+  </div>
+  <div class="controls">
+    <select id="surah" aria-label="Go to surah"></select>
+    <button id="prevSurah" title="Previous surah">&#8249; Prev</button>
+    <button id="nextSurah" title="Next surah">Next &#8250;</button>
+    <label class="sync"><input type="checkbox" id="syncScroll" checked> sync scroll</label>
+    <div class="views" role="group" aria-label="Layout">
+      <button data-v="split" class="on">Split</button>
+      <button data-v="ar">العربية</button>
+      <button data-v="en">English</button>
+    </div>
+  </div>
+</header>
+<main class="stage mode-split" id="stage">
+  <section class="pane" id="enPane">
+    <div class="bar"><span class="lbl">English<a class="pdf" href="en.pdf" download>PDF &#8595;</a></span>
+      <span class="pgbar"><button id="enPrev" title="Previous page">&#8249;</button>
+      <span class="pg" id="enPg"></span>
+      <button id="enNext" title="Next page">&#8250;</button></span></div>
+    <div class="scroll" id="enScroll"><div class="pages" id="enPages"></div></div>
+    <div class="overlay" id="enOverlay"><div class="spin"></div><div class="msg">Loading English PDF…</div></div>
+    <div class="notice" id="enNotice"></div>
+  </section>
+  <section class="pane" id="arPane" dir="rtl">
+    <div class="bar"><span class="lbl">العربية<a class="pdf" href="ar.pdf" download>PDF &#8595;</a></span>
+      <span class="pgbar"><button id="arPrev" title="Previous page">&#8249;</button>
+      <span class="pg" id="arPg"></span>
+      <button id="arNext" title="Next page">&#8250;</button></span></div>
+    <div class="scroll" id="arScroll"><div class="pages" id="arPages"></div></div>
+    <div class="overlay" id="arOverlay"><div class="spin"></div><div class="msg">جارٍ تحميل النسخة العربية…</div></div>
+    <div class="notice" id="arNotice"></div>
+  </section>
+</main>
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+const GAP = 14;          // must match .page margin-bottom
+
+let syncOn = true, suppressUntil = 0;
+let surahs = [], cur = -1, navInit = false;
+
+/* Page counts and height/width ratios measured from the generated webp files
+   (AR is uniform; the EN scan changes page size at p.126 — both ≈ 1.414). */
+const PAGES = { en: 356, ar: 432 };
+const ASP = {
+  en: n => (n <= 125 ? 1521 / 1075 : 1430 / 1105),
+  ar: () => 1521 / 1076,
+};
+
+function mkPane(p) {
+  const ov = $(p + 'Overlay');
+  return { id: p, scroll: $(p + 'Scroll'), pages: $(p + 'Pages'), overlay: ov,
+    msg: ov.querySelector('.msg'), notice: $(p + 'Notice'), pg: $(p + 'Pg'),
+    numPages: PAGES[p], asp: ASP[p], off: null, W: 0, wantPage: null,
+    slots: [], raf: 0 };
+}
+const EN = mkPane('en'), AR = mkPane('ar');
+const PANES = [EN, AR];
+const other = p => (p === EN ? AR : EN);
+
+/* ---------------- page slots (pre-rendered images) ---------------- */
+
+function buildSlots(p) {  // one .page slot per image; loading=lazy handles the window
+  const f = document.createDocumentFragment();
+  for (let i = 0; i < p.numPages; i++) {
+    const n = i + 1;
+    const d = document.createElement('div');
+    d.className = 'page'; d.dataset.pg = 'p. ' + n;
+    const img = document.createElement('img');
+    img.loading = 'lazy'; img.decoding = 'async'; img.alt = '';
+    img.addEventListener('load', () => d.classList.add('rendered'));
+    img.addEventListener('error', () => d.classList.add('err', 'rendered'));
+    img.src = '../pages/' + p.id + '/' + String(n).padStart(4, '0') + '.webp';
+    const sp = document.createElement('div'); sp.className = 'spin';
+    const b = document.createElement('div'); b.className = 'badge'; b.textContent = 'p. ' + n;
+    d.append(img, sp, b); f.appendChild(d);
+    p.slots.push(d);
+  }
+  p.pages.appendChild(f);
+}
+
+function layout(p) {  // content width -> per-page heights + cumulative offsets
+  p.W = p.pages.clientWidth - 24;   // .pages padding 12px each side
+  p.off = new Float64Array(p.numPages + 1);
+  for (let i = 0; i < p.numPages; i++) {
+    const h = p.asp(i + 1) * p.W;
+    p.off[i + 1] = p.off[i] + h + GAP;
+    p.slots[i].style.height = h.toFixed(1) + 'px';
+  }
+}
+
+function refresh(p) {  // (re)layout if width changed, then update indicator
+  if (!p.numPages || p.slots.length !== p.numPages) return;  // slots not built yet
+  const w = p.pages.clientWidth - 24;
+  if (w < 50) return;                    // pane hidden — keep old metrics
+  if (!p.off || Math.abs(w - p.W) > 2) layout(p);
+  if (p.wantPage != null) {              // deferred surah jump while hidden
+    const pg = p.wantPage; p.wantPage = null;
+    if (pg >= 1 && pg <= p.numPages) p.scroll.scrollTop = p.off[pg - 1] + 1;
+  }
+  update(p);
+}
+
+/* ---------------- scroll position → page indicator ---------------- */
+
+function idxAt(p, y) {  // index of page containing content-y (binary search)
+  let lo = 0, hi = p.numPages - 1, ans = 0;
+  while (lo <= hi) {
+    const m = (lo + hi) >> 1;
+    if (p.off[m] <= y) { ans = m; lo = m + 1; } else hi = m - 1;
+  }
+  return ans;
+}
+
+function update(p) {
+  if (!p.numPages || !p.off || !p.scroll.clientHeight) return;
+  p.pg.textContent = 'p. ' + (idxAt(p, p.scroll.scrollTop) + 1) + ' / ' + p.numPages;
+}
+
+/* ---------------- scroll sync (proportional, echo-guarded) ---------------- */
+
+function onScroll(p) {
+  update(p);
+  if (!syncOn || performance.now() < suppressUntil) return;
+  const o = other(p);
+  if (!p.numPages || !o.numPages) return;
+  const mp = p.scroll.scrollHeight - p.scroll.clientHeight;
+  const mo = o.scroll.scrollHeight - o.scroll.clientHeight;
+  if (mp <= 0 || mo <= 0) return;
+  const t = p.scroll.scrollTop / mp * mo;
+  // The echo of our own write lands within ~1px of the source position, so a
+  // >3px difference means a real user scroll — this prevents feedback loops.
+  if (Math.abs(o.scroll.scrollTop - t) > 3) o.scroll.scrollTop = t;
+}
+
+for (const p of PANES) {
+  p.scroll.addEventListener('scroll', () => {
+    if (p.raf) return;
+    p.raf = requestAnimationFrame(() => { p.raf = 0; onScroll(p); });
+  });
+}
+
+function snapSync() {  // align the other pane once when sync is switched on
+  const src = AR.numPages ? AR : (EN.numPages ? EN : null);
+  if (!src) return;
+  const dst = other(src);
+  const ms = src.scroll.scrollHeight - src.scroll.clientHeight;
+  const md = dst.scroll.scrollHeight - dst.scroll.clientHeight;
+  if (ms > 0 && md > 0) dst.scroll.scrollTop = src.scroll.scrollTop / ms * md;
+}
+
+$('syncScroll').addEventListener('change', e => {
+  syncOn = e.target.checked;
+  if (syncOn) snapSync();
+});
+
+/* ---------------- view modes ---------------- */
+
+function setMode(m) {
+  $('stage').className = 'stage mode-' + m;
+  document.querySelectorAll('.views button')
+    .forEach(b => b.classList.toggle('on', b.dataset.v === m));
+  for (const p of PANES) refresh(p);
+}
+document.querySelectorAll('.views button')
+  .forEach(b => b.addEventListener('click', () => setMode(b.dataset.v)));
+setMode(matchMedia('(max-width: 760px)').matches ? 'ar' : 'split');
+
+/* ---------------- surah navigation ---------------- */
+
+async function loadSurahs() {
+  try {
+    const r = await fetch('../data/surahs.json');
+    surahs = await r.json();
+  } catch (e) { surahs = []; }
+  const sel = $('surah');
+  if (!Array.isArray(surahs) || !surahs.length) {
+    sel.disabled = $('prevSurah').disabled = $('nextSurah').disabled = true;
+    tryInitNav(); return;
+  }
+  surahs.forEach((s, i) => {
+    const o = document.createElement('option');
+    o.value = i;
+    o.textContent = s.n + '. ' + s.nameAr + ' — ' + (s.nameEn || s.nameAr);
+    sel.appendChild(o);
+  });
+  sel.addEventListener('change', () => gotoSurah(+sel.value));
+  $('prevSurah').addEventListener('click', () => gotoSurah(cur - 1));
+  $('nextSurah').addEventListener('click', () => gotoSurah(cur + 1));
+  tryInitNav();
+}
+
+function tryInitNav() {  // jump to Al-Fatiha once surah data is ready
+  if (navInit || !surahs.length) return;
+  navInit = true;
+  gotoSurah(0);
+}
+
+function gotoSurah(i) {
+  if (!surahs.length) return;
+  i = Math.max(0, Math.min(surahs.length - 1, i));
+  cur = i;
+  const s = surahs[i];
+  $('surah').value = i;
+  $('prevSurah').disabled = i <= 0;
+  $('nextSurah').disabled = i >= surahs.length - 1;
+  suppressUntil = performance.now() + 300;  // keep page-accurate jumps exact
+  jump(EN, s.enPage, s);
+  jump(AR, s.arPage, s);
+}
+
+function jump(p, page, s) {
+  if (!p.numPages) return;
+  const label = s.nameEn || s.nameAr;
+  if (page == null || page < 1 || page > p.numPages) {
+    toast(p, label + ' — no dedicated section in this edition');
+    return;
+  }
+  if (!p.off) { p.wantPage = page; return; }   // pane not laid out yet (hidden)
+  p.scroll.scrollTop = p.off[page - 1] + 1;  // +1px: scrollTop floors fractions
+  update(p);
+}
+
+function toast(p, msg) {
+  p.notice.textContent = msg;
+  p.notice.classList.add('show');
+  clearTimeout(p._nt);
+  p._nt = setTimeout(() => p.notice.classList.remove('show'), 2800);
+}
+
+function step(p, d) {  // per-pane page stepping via the bar ‹ › buttons
+  if (!p.numPages || !p.off) return;
+  const i = Math.max(0, Math.min(p.numPages - 1, idxAt(p, p.scroll.scrollTop) + d));
+  p.scroll.scrollTop = p.off[i] + 1;
+  update(p);
+}
+$('enPrev').addEventListener('click', () => step(EN, -1));
+$('enNext').addEventListener('click', () => step(EN, 1));
+$('arPrev').addEventListener('click', () => step(AR, -1));
+$('arNext').addEventListener('click', () => step(AR, 1));
+
+/* ---------------- resize & boot ---------------- */
+
+let rT = 0;
+addEventListener('resize', () => {
+  clearTimeout(rT);
+  rT = setTimeout(() => { for (const p of PANES) refresh(p); }, 200);
+});
+
+for (const p of PANES) {
+  buildSlots(p);
+  p.overlay.style.display = 'none';
+  refresh(p);
+}
+loadSurahs();
+</script>
+</body>
+</html>

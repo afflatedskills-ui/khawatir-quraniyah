@@ -1,0 +1,875 @@
+[
+ {
+  "n": 1,
+  "nameAr": "الفاتحة",
+  "nameEn": "Surat Al-Fatiha (The Opener)",
+  "enPage": 10,
+  "arPage": 15
+ },
+ {
+  "n": 2,
+  "nameAr": "البقرة",
+  "nameEn": "Surat Al-Baqara (The Cow)",
+  "enPage": 18,
+  "arPage": 19
+ },
+ {
+  "n": 3,
+  "nameAr": "آل عمران",
+  "nameEn": "Surat Al-Imran (The Family of Imran)",
+  "enPage": 39,
+  "arPage": 45
+ },
+ {
+  "n": 4,
+  "nameAr": "النساء",
+  "nameEn": "Surat An-Nisa (The Women)",
+  "enPage": 57,
+  "arPage": 64
+ },
+ {
+  "n": 5,
+  "nameAr": "المائدة",
+  "nameEn": "Surat Al-Ma’idah (The Table)",
+  "enPage": 70,
+  "arPage": 80
+ },
+ {
+  "n": 6,
+  "nameAr": "الأنعام",
+  "nameEn": "Surat Al-An’am (The Cattle)",
+  "enPage": 85,
+  "arPage": 98
+ },
+ {
+  "n": 7,
+  "nameAr": "الأعراف",
+  "nameEn": "Surat Al-A’raf (The Battlements)",
+  "enPage": 96,
+  "arPage": 110
+ },
+ {
+  "n": 8,
+  "nameAr": "الأنفال",
+  "nameEn": "Surat Al-Anfal (The Spoils)",
+  "enPage": 108,
+  "arPage": 125
+ },
+ {
+  "n": 9,
+  "nameAr": "التوبة",
+  "nameEn": "Surat At-Tawbah (the Repentance)",
+  "enPage": 117,
+  "arPage": 137
+ },
+ {
+  "n": 10,
+  "nameAr": "يونس",
+  "nameEn": "Surat Yunus (Jonah)",
+  "enPage": 128,
+  "arPage": 148
+ },
+ {
+  "n": 11,
+  "nameAr": "هود",
+  "nameEn": "Surat Hud",
+  "enPage": 137,
+  "arPage": 159
+ },
+ {
+  "n": 12,
+  "nameAr": "يوسف",
+  "nameEn": "Surat Yusuf (Joseph)",
+  "enPage": 148,
+  "arPage": 171
+ },
+ {
+  "n": 13,
+  "nameAr": "الرعد",
+  "nameEn": "Surat Ar-Ra'd (Thunder)",
+  "enPage": 153,
+  "arPage": 177
+ },
+ {
+  "n": 14,
+  "nameAr": "إبراهيم",
+  "nameEn": "Surat Ibrahim (Abraham)",
+  "enPage": 158,
+  "arPage": 184
+ },
+ {
+  "n": 15,
+  "nameAr": "الحجر",
+  "nameEn": "Surat Al-Hijr (Thamood’s Habitation)",
+  "enPage": 163,
+  "arPage": 190
+ },
+ {
+  "n": 16,
+  "nameAr": "النحل",
+  "nameEn": "Surat An-Nahl (The Bees)",
+  "enPage": 169,
+  "arPage": 196
+ },
+ {
+  "n": 17,
+  "nameAr": "الإسراء",
+  "nameEn": "Surat Al-Israa (The Night Journey)",
+  "enPage": 180,
+  "arPage": 208
+ },
+ {
+  "n": 18,
+  "nameAr": "الكهف",
+  "nameEn": "Surat Al-Kahf (The Cave)",
+  "enPage": 188,
+  "arPage": 217
+ },
+ {
+  "n": 19,
+  "nameAr": "مريم",
+  "nameEn": "Surat Maryam (AS) (Mary)",
+  "enPage": 198,
+  "arPage": 230
+ },
+ {
+  "n": 20,
+  "nameAr": "طه",
+  "nameEn": "Surat Ta-Ha",
+  "enPage": 204,
+  "arPage": 237
+ },
+ {
+  "n": 21,
+  "nameAr": "الأنبياء",
+  "nameEn": "Surat Al-Anbiya (The Prophets)",
+  "enPage": 209,
+  "arPage": 243
+ },
+ {
+  "n": 22,
+  "nameAr": "الحج",
+  "nameEn": "Surat Al-Hajj (The Pilgrimage)",
+  "enPage": 213,
+  "arPage": 247
+ },
+ {
+  "n": 23,
+  "nameAr": "المؤمنون",
+  "nameEn": "Surat Al-Mu’minun (The Believers)",
+  "enPage": 216,
+  "arPage": 251
+ },
+ {
+  "n": 24,
+  "nameAr": "النور",
+  "nameEn": "Surat An-Nur (The Light)",
+  "enPage": 219,
+  "arPage": 255
+ },
+ {
+  "n": 25,
+  "nameAr": "الفرقان",
+  "nameEn": "Surat Al-Furqan (The Criterion)",
+  "enPage": 229,
+  "arPage": 268
+ },
+ {
+  "n": 26,
+  "nameAr": "الشعراء",
+  "nameEn": "Surat Ash-Shu’ara (The Poets)",
+  "enPage": 234,
+  "arPage": 274
+ },
+ {
+  "n": 27,
+  "nameAr": "النمل",
+  "nameEn": "Surat An-Naml (The Ant)",
+  "enPage": 238,
+  "arPage": 279
+ },
+ {
+  "n": 28,
+  "nameAr": "القصص",
+  "nameEn": "Surat Al-Qasas (The Narrative)",
+  "enPage": 246,
+  "arPage": 290
+ },
+ {
+  "n": 29,
+  "nameAr": "العنكبوت",
+  "nameEn": "Surat Al-Ankabut (The Spider)",
+  "enPage": 255,
+  "arPage": 300
+ },
+ {
+  "n": 30,
+  "nameAr": "الروم",
+  "nameEn": "Surat Ar-Rum (The Romans)",
+  "enPage": 259,
+  "arPage": 300
+ },
+ {
+  "n": 31,
+  "nameAr": "لقمان",
+  "nameEn": "Surat Luqman",
+  "enPage": 262,
+  "arPage": 309
+ },
+ {
+  "n": 32,
+  "nameAr": "السجدة",
+  "nameEn": "Surat As-Sajdah (Prostration)",
+  "enPage": 267,
+  "arPage": 315
+ },
+ {
+  "n": 33,
+  "nameAr": "الأحزاب",
+  "nameEn": "Surat Al-Ahzab (The allied parties)",
+  "enPage": 270,
+  "arPage": 318
+ },
+ {
+  "n": 34,
+  "nameAr": "سبإ",
+  "nameEn": "Surat Saba’ (Sheba)",
+  "enPage": 273,
+  "arPage": 318
+ },
+ {
+  "n": 35,
+  "nameAr": "فاطر",
+  "nameEn": "Surat Fatir (The Originator)",
+  "enPage": 275,
+  "arPage": 325
+ },
+ {
+  "n": 36,
+  "nameAr": "يس",
+  "nameEn": "Surat Ya-Seen",
+  "enPage": 276,
+  "arPage": 327
+ },
+ {
+  "n": 37,
+  "nameAr": "الصافات",
+  "nameEn": "Surat As-Saffat (The ones ranged in ranks)",
+  "enPage": 278,
+  "arPage": 329
+ },
+ {
+  "n": 38,
+  "nameAr": "ص",
+  "nameEn": "Surat Sad",
+  "enPage": 279,
+  "arPage": 331
+ },
+ {
+  "n": 39,
+  "nameAr": "الزمر",
+  "nameEn": "Surat Az-Zumar (The Hordes)",
+  "enPage": 282,
+  "arPage": 334
+ },
+ {
+  "n": 40,
+  "nameAr": "غافر",
+  "nameEn": "Surat Ghafir (The Forgiver)",
+  "enPage": 286,
+  "arPage": 340
+ },
+ {
+  "n": 41,
+  "nameAr": "فصلت",
+  "nameEn": "Surat Fussilat (Expounded)",
+  "enPage": 295,
+  "arPage": 347
+ },
+ {
+  "n": 42,
+  "nameAr": "الشورى",
+  "nameEn": "Surat Ash-Shura (Counsel)",
+  "enPage": 296,
+  "arPage": 349
+ },
+ {
+  "n": 43,
+  "nameAr": "الزخرف",
+  "nameEn": "Surat Az-Zukhruf (Decoration)",
+  "enPage": 297,
+  "arPage": 353
+ },
+ {
+  "n": 44,
+  "nameAr": "الدخان",
+  "nameEn": "Surat Ad-Dukhan (Smoke)",
+  "enPage": 299,
+  "arPage": 356
+ },
+ {
+  "n": 45,
+  "nameAr": "الجاثية",
+  "nameEn": "Surat Al-Jathiyah (Kneeling)",
+  "enPage": 300,
+  "arPage": 357,
+  "arMention": true
+ },
+ {
+  "n": 46,
+  "nameAr": "الأحقاف",
+  "nameEn": "Surat Al-Ahqaf (The Sand Dunes)",
+  "enPage": 300,
+  "arPage": 358
+ },
+ {
+  "n": 47,
+  "nameAr": "محمد",
+  "nameEn": "Surat Muhammad",
+  "enPage": 303,
+  "arPage": 361
+ },
+ {
+  "n": 48,
+  "nameAr": "الفتح",
+  "nameEn": "Surat Al-Fath (The Conquest)",
+  "enPage": 305,
+  "arPage": 364
+ },
+ {
+  "n": 49,
+  "nameAr": "الحجرات",
+  "nameEn": "Surat Al-Hujuraat (The Apartments)",
+  "enPage": 309,
+  "arPage": 369
+ },
+ {
+  "n": 50,
+  "nameAr": "ق",
+  "nameEn": "Surat Qaf (The Witnessed Day)",
+  "enPage": 312,
+  "arPage": 373
+ },
+ {
+  "n": 51,
+  "nameAr": "الذاريات",
+  "nameEn": "Surat Adh-Dhariyat (The Winnowers)",
+  "enPage": 314,
+  "arPage": 376
+ },
+ {
+  "n": 52,
+  "nameAr": "الطور",
+  "nameEn": "Surat At-Tur (The Mount)",
+  "enPage": 316,
+  "arPage": 378
+ },
+ {
+  "n": 53,
+  "nameAr": "النجم",
+  "nameEn": "Surat An-Najm (The Star)",
+  "enPage": 317,
+  "arPage": 379
+ },
+ {
+  "n": 54,
+  "nameAr": "القمر",
+  "nameEn": "Surat Al-Qamar (The Moon)",
+  "enPage": 319,
+  "arPage": 382
+ },
+ {
+  "n": 55,
+  "nameAr": "الرحمن",
+  "nameEn": "Surat Ar-Rahman (The All-Merciful)",
+  "enPage": 321,
+  "arPage": 382
+ },
+ {
+  "n": 56,
+  "nameAr": "الواقعة",
+  "nameEn": "Surat Al-Waqi’ah (The Event)",
+  "enPage": 322,
+  "arPage": 386
+ },
+ {
+  "n": 57,
+  "nameAr": "الحديد",
+  "nameEn": "Surat Al-Hadid (Iron)",
+  "enPage": 323,
+  "arPage": 387
+ },
+ {
+  "n": 58,
+  "nameAr": "المجادلة",
+  "nameEn": "Al-Mujadila (The Pleader)",
+  "enPage": 352,
+  "enGuess": true,
+  "arPage": 396
+ },
+ {
+  "n": 59,
+  "nameAr": "الحشر",
+  "nameEn": "Al-Hashr (The Exile)",
+  "enPage": 332,
+  "arPage": 399
+ },
+ {
+  "n": 60,
+  "nameAr": "الممتحنة",
+  "nameEn": "Al-Mumtahanah (She Who Is Examined)",
+  "enPage": 352,
+  "enGuess": true,
+  "arPage": 402
+ },
+ {
+  "n": 61,
+  "nameAr": "الصف",
+  "nameEn": "As-Saff (The Ranks)",
+  "enPage": 352,
+  "enGuess": true,
+  "arPage": 405
+ },
+ {
+  "n": 62,
+  "nameAr": "الجمعة",
+  "nameEn": "Al-Jumu'ah (Friday)",
+  "enLoose": true,
+  "enPage": 338,
+  "arPage": 407
+ },
+ {
+  "n": 63,
+  "nameAr": "المنافقون",
+  "nameEn": "Al-Munafiqun (The Hypocrites)",
+  "enPage": 339,
+  "arPage": 408
+ },
+ {
+  "n": 64,
+  "nameAr": "التغابن",
+  "nameEn": "At-Taghabun (Dispossession)",
+  "enPage": 340,
+  "arPage": 411,
+  "arMention": true
+ },
+ {
+  "n": 65,
+  "nameAr": "الطلاق",
+  "nameEn": "At-Talaq (Divorce)",
+  "enPage": 341,
+  "arPage": 411,
+  "arMention": true
+ },
+ {
+  "n": 66,
+  "nameAr": "التحريم",
+  "nameEn": "At-Tahrim (The Prohibition)",
+  "enPage": 342,
+  "arPage": 394,
+  "arMention": true
+ },
+ {
+  "n": 67,
+  "nameAr": "الملك",
+  "nameEn": "Al-Mulk (The Sovereignty)",
+  "enPage": 343,
+  "arPage": 419,
+  "arMention": true
+ },
+ {
+  "n": 68,
+  "nameAr": "القلم",
+  "nameEn": "Al-Qalam (The Pen)",
+  "enPage": 344,
+  "arPage": 415
+ },
+ {
+  "n": 69,
+  "nameAr": "الحاقة",
+  "nameEn": "Al-Haqqah (The Reality)",
+  "enPage": 344,
+  "arPage": 416
+ },
+ {
+  "n": 70,
+  "nameAr": "المعارج",
+  "nameEn": "Al-Ma'arij (The Ascending Stairways)",
+  "enPage": 345,
+  "arPage": 416,
+  "arMention": true
+ },
+ {
+  "n": 71,
+  "nameAr": "نوح",
+  "nameEn": "Nuh (Noah)",
+  "enPage": 345,
+  "arPage": 418
+ },
+ {
+  "n": 72,
+  "nameAr": "الجن",
+  "nameEn": "Al-Jinn (The Jinn)",
+  "enPage": 347,
+  "arPage": 420
+ },
+ {
+  "n": 73,
+  "nameAr": "المزمل",
+  "nameEn": "Al-Muzzammil (The Enshrouded One)",
+  "enPage": 348,
+  "arPage": 421
+ },
+ {
+  "n": 74,
+  "nameAr": "المدثر",
+  "nameEn": "Al-Muddaththir (The Cloaked One)",
+  "enPage": 349,
+  "arPage": 422
+ },
+ {
+  "n": 75,
+  "nameAr": "القيامة",
+  "nameEn": "Al-Qiyamah (The Resurrection)",
+  "enPage": 350,
+  "arPage": 423,
+  "arMention": true
+ },
+ {
+  "n": 76,
+  "nameAr": "الإنسان",
+  "nameEn": "Al-Insan (The Human)",
+  "enPage": 350,
+  "arPage": 423,
+  "arMention": true
+ },
+ {
+  "n": 77,
+  "nameAr": "المرسلات",
+  "nameEn": "Al-Mursalat (Those Sent Forth)",
+  "enPage": 350,
+  "arPage": 423
+ },
+ {
+  "n": 78,
+  "nameAr": "النبإ",
+  "nameEn": "An-Naba' (The Great News)",
+  "enPage": 352,
+  "enGuess": true,
+  "arPage": null,
+  "arNotCovered": true
+ },
+ {
+  "n": 79,
+  "nameAr": "النازعات",
+  "nameEn": "An-Nazi'at (Those Who Drag Forth)",
+  "enPage": 352,
+  "enGuess": true,
+  "arPage": null,
+  "arNotCovered": true
+ },
+ {
+  "n": 80,
+  "nameAr": "عبس",
+  "nameEn": "Abasa (He Frowned)",
+  "enPage": 352,
+  "enGuess": true,
+  "arPage": 425,
+  "arMention": true
+ },
+ {
+  "n": 81,
+  "nameAr": "التكوير",
+  "nameEn": "At-Takwir (The Overthrowing)",
+  "enPage": 352,
+  "enGuess": true,
+  "arPage": null,
+  "arNotCovered": true
+ },
+ {
+  "n": 82,
+  "nameAr": "الانفطار",
+  "nameEn": "Al-Infitar (The Cleaving)",
+  "enPage": 352,
+  "enGuess": true,
+  "arPage": null,
+  "arNotCovered": true
+ },
+ {
+  "n": 83,
+  "nameAr": "المطففين",
+  "nameEn": "Al-Mutaffifin (The Defrauding)",
+  "enPage": 352,
+  "enGuess": true,
+  "arPage": null,
+  "arNotCovered": true
+ },
+ {
+  "n": 84,
+  "nameAr": "الانشقاق",
+  "nameEn": "Al-Inshiqaq (The Sundering)",
+  "enLoose": true,
+  "enPage": 259,
+  "arPage": 305,
+  "arMention": true
+ },
+ {
+  "n": 85,
+  "nameAr": "البروج",
+  "nameEn": "Al-Buruj (The Mansions of Stars)",
+  "enPage": 352,
+  "enGuess": true,
+  "arPage": null,
+  "arNotCovered": true
+ },
+ {
+  "n": 86,
+  "nameAr": "الطارق",
+  "nameEn": "At-Tariq (The Night Visitor)",
+  "enPage": 352,
+  "arPage": 426
+ },
+ {
+  "n": 87,
+  "nameAr": "الأعلى",
+  "nameEn": "Al-A'la (The Most High)",
+  "enPage": 352,
+  "enGuess": true,
+  "arPage": null,
+  "arNotCovered": true
+ },
+ {
+  "n": 88,
+  "nameAr": "الغاشية",
+  "nameEn": "Al-Ghashiyah (The Overwhelming)",
+  "enPage": 352,
+  "enGuess": true,
+  "arPage": null,
+  "arNotCovered": true
+ },
+ {
+  "n": 89,
+  "nameAr": "الفجر",
+  "nameEn": "Al-Fajr (The Dawn)",
+  "enPage": 352,
+  "enGuess": true,
+  "arPage": null,
+  "arNotCovered": true
+ },
+ {
+  "n": 90,
+  "nameAr": "البلد",
+  "nameEn": "Al-Balad (The City)",
+  "enPage": 352,
+  "enGuess": true,
+  "arPage": null,
+  "arNotCovered": true
+ },
+ {
+  "n": 91,
+  "nameAr": "الشمس",
+  "nameEn": "Ash-Shams (The Sun)",
+  "enPage": 352,
+  "enGuess": true,
+  "arPage": 426,
+  "arMention": true
+ },
+ {
+  "n": 92,
+  "nameAr": "الليل",
+  "nameEn": "Al-Layl (The Night)",
+  "enPage": 352,
+  "enGuess": true,
+  "arPage": null,
+  "arNotCovered": true
+ },
+ {
+  "n": 93,
+  "nameAr": "الضحى",
+  "nameEn": "Ad-Duha (The Forenoon)",
+  "enPage": 353,
+  "arPage": 426,
+  "arMention": true
+ },
+ {
+  "n": 94,
+  "nameAr": "الشرح",
+  "nameEn": "Al-Inshirah (The Expansion)",
+  "enPage": 352,
+  "enGuess": true,
+  "arPage": null,
+  "arNotCovered": true
+ },
+ {
+  "n": 95,
+  "nameAr": "التين",
+  "nameEn": "At-Tin (The Fig)",
+  "enPage": 352,
+  "enGuess": true,
+  "arPage": 427,
+  "arMention": true
+ },
+ {
+  "n": 96,
+  "nameAr": "العلق",
+  "nameEn": "Al-Alaq (The Clot)",
+  "enPage": 354,
+  "arPage": 428
+ },
+ {
+  "n": 97,
+  "nameAr": "القدر",
+  "nameEn": "Al-Qadr (The Decree)",
+  "enPage": 352,
+  "enGuess": true,
+  "arPage": null,
+  "arNotCovered": true
+ },
+ {
+  "n": 98,
+  "nameAr": "البينة",
+  "nameEn": "Al-Bayyinah (The Clear Proof)",
+  "enPage": 352,
+  "enGuess": true,
+  "arPage": null,
+  "arNotCovered": true
+ },
+ {
+  "n": 99,
+  "nameAr": "الزلزلة",
+  "nameEn": "Az-Zalzalah (The Earthquake)",
+  "enPage": 352,
+  "enGuess": true,
+  "arPage": null,
+  "arNotCovered": true
+ },
+ {
+  "n": 100,
+  "nameAr": "العاديات",
+  "nameEn": "Al-Adiyat (The Courser)",
+  "enPage": 352,
+  "enGuess": true,
+  "arPage": null,
+  "arNotCovered": true
+ },
+ {
+  "n": 101,
+  "nameAr": "القارعة",
+  "nameEn": "Al-Qari'ah (The Calamity)",
+  "enPage": 352,
+  "enGuess": true,
+  "arPage": null,
+  "arNotCovered": true
+ },
+ {
+  "n": 102,
+  "nameAr": "التكاثر",
+  "nameEn": "At-Takathur (The Rivalry in Increase)",
+  "enPage": 354,
+  "arPage": 428,
+  "arMention": true
+ },
+ {
+  "n": 103,
+  "nameAr": "العصر",
+  "nameEn": "Al-Asr (The Declining Day)",
+  "enPage": 355,
+  "arPage": 429
+ },
+ {
+  "n": 104,
+  "nameAr": "الهمزة",
+  "nameEn": "Al-Humazah (The Slanderer)",
+  "enPage": 352,
+  "enGuess": true,
+  "arPage": null,
+  "arNotCovered": true
+ },
+ {
+  "n": 105,
+  "nameAr": "الفيل",
+  "nameEn": "Al-Fil (The Elephant)",
+  "enPage": 356,
+  "arPage": 430
+ },
+ {
+  "n": 106,
+  "nameAr": "قريش",
+  "nameEn": "Quraysh",
+  "enPage": 356,
+  "arPage": 430
+ },
+ {
+  "n": 107,
+  "nameAr": "الماعون",
+  "nameEn": "Al-Ma'un (Small Kindnesses)",
+  "enPage": null,
+  "enGuess": true,
+  "arPage": null,
+  "notCovered": true
+ },
+ {
+  "n": 108,
+  "nameAr": "الكوثر",
+  "nameEn": "Al-Kawthar (The Abundance)",
+  "enPage": null,
+  "enGuess": true,
+  "arPage": null,
+  "notCovered": true
+ },
+ {
+  "n": 109,
+  "nameAr": "الكافرون",
+  "nameEn": "Al-Kafirun (The Disbelievers)",
+  "enPage": null,
+  "enGuess": true,
+  "arPage": null,
+  "notCovered": true
+ },
+ {
+  "n": 110,
+  "nameAr": "النصر",
+  "nameEn": "An-Nasr (The Divine Support)",
+  "enPage": null,
+  "arPage": null,
+  "notCovered": true
+ },
+ {
+  "n": 111,
+  "nameAr": "اللهب",
+  "nameEn": "Al-Masad (The Palm Fiber)",
+  "enPage": null,
+  "enGuess": true,
+  "arPage": null,
+  "notCovered": true
+ },
+ {
+  "n": 112,
+  "nameAr": "الإخلاص",
+  "nameEn": "Al-Ikhlas (The Sincerity)",
+  "enPage": null,
+  "enGuess": true,
+  "arPage": null,
+  "arMention": true,
+  "notCovered": true
+ },
+ {
+  "n": 113,
+  "nameAr": "الفلق",
+  "nameEn": "Al-Falaq (The Daybreak)",
+  "enPage": null,
+  "enGuess": true,
+  "arPage": null,
+  "notCovered": true
+ },
+ {
+  "n": 114,
+  "nameAr": "الناس",
+  "nameEn": "An-Nas (Mankind)",
+  "enPage": null,
+  "enGuess": true,
+  "arPage": null,
+  "arMention": true,
+  "notCovered": true
+ }
+]

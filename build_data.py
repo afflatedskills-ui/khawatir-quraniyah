@@ -19,7 +19,7 @@ ROOT = Path(__file__).resolve().parent.parent
 SITE = ROOT / "site"
 AR_PDF = ROOT / "ar" / "khawatir-quraniyah-ar-amr-khaled.pdf"
 EN_PDFS = [ROOT / "en" / f"quranic-reflections-en-part{i}-of-3.pdf" for i in (1, 2, 3)]
-OCR_DIR = Path("/tmp/arocr/pages")
+OCR_DIR = Path("/home/username/islam/_ocr-work/pg-ocr")
 TMP = Path("/tmp/kqsite")
 TMP.mkdir(exist_ok=True)
 
@@ -123,16 +123,34 @@ def match_ar_name(raw: str, prev_idx: int) -> int:
 def detect_ar_surah(page_text: str, prev_idx: int) -> int:
     lines = [strip_bidi(l).strip() for l in page_text.splitlines() if l.strip()]
     head = lines[:6]
-    # pass 1: lines containing سورة
+    # pass 1: lines containing سورة/سور header markers
     for l in head:
-        if "سورة" in l:
-            m = re.search(r"سورة\s*(.+)$", l)
-            if m:
-                frag = re.sub(r"[0-9٠-٩]+", "", m.group(1))
-                frag = frag.strip(" .،:؛!؟?-–—")
-                idx = match_ar_name(frag, prev_idx)
-                if idx >= 0:
-                    return idx
+        m = re.match(r"^\s*[\d٠-٩]*\s*سور[ة]?\s+(.+?)\s*$", l)
+        if m:
+            frag = re.sub(r"[0-9٠-٩]+", "", m.group(1))
+            frag = frag.strip(" .،:؛!؟?-–—")
+            idx = match_ar_name(frag, prev_idx)
+            if idx < 0 and len(frag) <= 80:
+                # grouped headers like "التغابن والطلاق والتحريم": every
+                # token must resolve to a surah name, else it's prose/TOC
+                toks = []
+                for t in frag.split():
+                    t = t.strip("()،.:؛!؟?-–—")
+                    t = re.sub(r"^وال", "", t)
+                    if not t:
+                        continue
+                    hits = [i for i, c in enumerate(CANON_AR_NORM)
+                            if norm_ar(t) == c or (len(norm_ar(t)) >= 2 and c.startswith(norm_ar(t)))
+                            or norm_ar("ال" + t) == c or (len(norm_ar(t)) >= 2 and c.startswith(norm_ar("ال" + t)))]
+                    if not hits:
+                        toks = None
+                        break
+                    toks.append(hits)
+                if toks:
+                    idx = min(i for hits in toks for i in hits if i >= prev_idx) if any(
+                        any(i >= prev_idx for i in hits) for hits in toks) else -1
+            if idx >= 0:
+                return idx
     # pass 2: bare short line equal to a surah name
     for l in head:
         if len(l) <= 25:
@@ -288,7 +306,9 @@ def main() -> None:
             lines = t.splitlines()
             kept = []
             for j, l in enumerate(lines):
-                if j < 3 and re.match(r"^\s*سورة\s+\S+.*\d+\s*$", strip_bidi(l).strip()):
+                hs = strip_bidi(l).strip()
+                if j < 3 and (re.match(r"^\s*[\d٠-٩]+\s*سور[ة]?\s+", hs)
+                              or re.match(r"^\s*سورة\s+\S+.*\d+\s*$", hs)):
                     continue
                 kept.append(l)
             text = unwrap("\n".join(kept))

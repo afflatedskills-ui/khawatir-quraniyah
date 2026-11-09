@@ -284,7 +284,7 @@
   "nameAr": "فصلت",
   "nameEn": "Surat Fussilat (Expounded)",
   "enPage": 295,
-  "arPage": 347
+  "arPage": 346
  },
  {
   "n": 42,
@@ -298,22 +298,21 @@
   "nameAr": "الزخرف",
   "nameEn": "Surat Az-Zukhruf (Decoration)",
   "enPage": 297,
-  "arPage": 353
+  "arPage": 347
  },
  {
   "n": 44,
   "nameAr": "الدخان",
   "nameEn": "Surat Ad-Dukhan (Smoke)",
   "enPage": 299,
-  "arPage": 356
+  "arPage": 347
  },
  {
   "n": 45,
   "nameAr": "الجاثية",
   "nameEn": "Surat Al-Jathiyah (Kneeling)",
   "enPage": 300,
-  "arPage": 357,
-  "arMention": true
+  "arPage": 347
  },
  {
   "n": 46,
@@ -405,7 +404,7 @@
   "nameEn": "Al-Mujadila (The Pleader)",
   "enPage": 352,
   "enGuess": true,
-  "arPage": 396
+  "arPage": 394
  },
  {
   "n": 59,
@@ -450,8 +449,7 @@
   "nameAr": "التغابن",
   "nameEn": "At-Taghabun (Dispossession)",
   "enPage": 340,
-  "arPage": 411,
-  "arMention": true
+  "arPage": 410
  },
  {
   "n": 65,
@@ -474,7 +472,7 @@
   "nameAr": "الملك",
   "nameEn": "Al-Mulk (The Sovereignty)",
   "enPage": 343,
-  "arPage": 419,
+  "arPage": 414,
   "arMention": true
  },
  {
@@ -496,8 +494,7 @@
   "nameAr": "المعارج",
   "nameEn": "Al-Ma'arij (The Ascending Stairways)",
   "enPage": 345,
-  "arPage": 416,
-  "arMention": true
+  "arPage": 416
  },
  {
   "n": 71,
@@ -532,8 +529,7 @@
   "nameAr": "القيامة",
   "nameEn": "Al-Qiyamah (The Resurrection)",
   "enPage": 350,
-  "arPage": 423,
-  "arMention": true
+  "arPage": 423
  },
  {
   "n": 76,
@@ -688,8 +684,7 @@
   "nameAr": "الضحى",
   "nameEn": "Ad-Duha (The Forenoon)",
   "enPage": 353,
-  "arPage": 426,
-  "arMention": true
+  "arPage": 426
  },
  {
   "n": 94,

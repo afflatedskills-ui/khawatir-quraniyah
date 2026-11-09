@@ -143,6 +143,149 @@ def mech_align(arB, enB):
                 assign[i].append(j); break
     return [{'ar': [i], 'en': assign[i]} for i in range(len(arB))]
 
+# ---------- section re-slicing ----------
+# A few regions were extracted across section boundaries: guessed page
+# ranges pulled a neighbouring part's shared "conclusion" section (the
+# 25 identical "Thirtieth Part Conclusion" files) or duplicated another
+# surah's section. For those regions we ignore the per-surah block files
+# and re-derive blocks from data/{ar,en}.json over explicit page ranges,
+# splitting the combined section at surah headers. Source files under
+# /tmp/kqbook are left untouched (provenance preserved).
+#
+# RESLICE entries: (arPages, enPages, surahs, introSurah, extraSplits)
+#   introSurah: surah that receives the leading intro blocks (before the
+#     first surah header); None = leave intro where the neighbouring
+#     surah's own block file already keeps it.
+#   extraSplits: {lang: [(bucketSurah, regex, newSurah)]} — within a
+#     header bucket, move blocks from the first regex match onward into
+#     newSurah's bucket (for sections whose header is mid-sentence).
+
+RESLICE = [
+    ((393, 409), (330, 338), [58, 59, 60, 61], None,
+     {'ar': [(60, r'سوره\s+الصف\s+واضح', 61)]}),
+    ((425, 430), (352, 356), list(range(78, 107)), 80, {}),
+]
+
+# Surahs whose English block file is a shared multi-surah section while the
+# Arabic file is already specific to this surah. For these we keep only this
+# surah's dedicated "Surat X" subsection (plus the section intro when this
+# surah opens the file); sibling-surah subsections belong to their own
+# entries. Arabic is left whole — its section boundaries are not reliably
+# header-delimited, and where both sides span the same surahs (75-77) the
+# pairing is already consistent.
+EN_TRIM = {11, 36, 45, 46, 49, 68, 70, 71}
+
+def trim_en_blocks(n, enB):
+    """Return enB reduced to surah n's dedicated section, or enB unchanged."""
+    if n not in EN_TRIM or not enB:
+        return enB
+    bk = _split_region(enB, 'en', _en_name_map(), _ar_name_list())
+    intro = bk.pop(0, [])
+    first = next((k for k in bk if k != 0), None)
+    keep = list(bk.get(n, []))
+    if intro and first == n:
+        keep = intro + keep
+    return keep or enB
+
+_AR_DIAC = re.compile('[\u0640\u064B-\u065F\u0670\u06D6-\u06ED]')  # harakat, dagger alef, tatweel, qc marks
+def _norm_ar(s):
+    s = _AR_DIAC.sub('', s)
+    for a, b in (('أ','ا'),('إ','ا'),('آ','ا'),('ٱ','ا'),('ة','ه'),('ى','ي')):
+        s = s.replace(a, b)
+    return re.sub(r'\s+', ' ', s).strip()
+
+# English header-token -> surah. Built from surahs.json nameEn plus the
+# spelling variants the book actually uses in section headers.
+_EN_ALIAS = {
+    'almujadalah': 58, 'almujadila': 58, 'almumtahina': 60,
+    'almumtahanah': 60, 'assaf': 61, 'assaff': 61, 'aljumuaa': 62,
+    'aljumua': 62, 'aljumuaah': 62, "aljumu'ah": 62, 'atteen': 95,
+    'alfeel': 105, 'alfil': 105, 'annasr': 110, 'alshams': 91,
+    'aldhuha': 93, 'adduha': 93, 'abasa': 80, 'abbasa': 80,
+    'attariq': 86, 'altariq': 86, 'alaq': 96, 'alaalaq': 96,
+}
+_EN_HDR = re.compile(r"^\s*=?\s*Surat\s+([A-Z][A-Za-z'’\-]+)")
+_AR_HDR = re.compile(r'^سوره\s+')
+
+def _en_name_map():
+    m = {}
+    for s in json.load(open(f'{SITE}/data/surahs.json')):
+        base = s.get('nameEn', '').split('(')[0].strip()
+        base = re.sub(r'^Surat\s+', '', base, flags=re.I)
+        key = re.sub(r'[^a-z]', '', base.lower())
+        if key:
+            m[key] = s['n']
+    m.update(_EN_ALIAS)
+    return m
+
+def _ar_name_list():
+    out = []
+    for s in json.load(open(f'{SITE}/data/surahs.json')):
+        k = _norm_ar(s['nameAr'])
+        if k:
+            out.append((k, s['n']))
+    return sorted(out, key=lambda x: -len(x[0]))
+
+def _en_hdr_num(block, en2n):
+    m = _EN_HDR.match(block)
+    if not m:
+        return None
+    tok = re.sub(r"[^a-z]", '', m.group(1).lower())
+    return en2n.get(tok)
+
+def _ar_hdr_num(block, ar_names):
+    nb = _norm_ar(block)
+    m = _AR_HDR.match(nb)
+    if not m:
+        return None
+    rest = nb[m.end():]
+    for name, num in ar_names:
+        if rest.startswith(name):
+            return num
+    return None
+
+def _region_blocks(lang, p0, p1):
+    pages = json.load(open(f'{SITE}/data/{lang}.json'))['pages']
+    t = '\n\n'.join(p['t'] for p in pages
+                    if p0 <= p['p'] <= p1 and p['t'].strip())
+    return clean_blocks(t)
+
+def _split_region(bs, lang, en2n, ar_names):
+    buckets = {}
+    cur = 0
+    for b in bs:
+        num = _en_hdr_num(b, en2n) if lang == 'en' else _ar_hdr_num(b, ar_names)
+        if num:
+            cur = num
+        buckets.setdefault(cur, []).append(b)
+    return buckets
+
+def resliced_blocks():
+    """Return {surah: {'ar': [...], 'en': [...]}} for re-sliced regions."""
+    en2n = _en_name_map()
+    ar_names = _ar_name_list()
+    out = {}
+    for ar_rng, en_rng, surahs, intro_to, extra in RESLICE:
+        for lang, rng in (('ar', ar_rng), ('en', en_rng)):
+            p0, p1 = rng
+            bk = _split_region(_region_blocks(lang, p0, p1), lang, en2n, ar_names)
+            intro = bk.pop(0, [])
+            for bnum, pat, newn in extra.get(lang, []):
+                if bnum in bk:
+                    idx = next((i for i, b in enumerate(bk[bnum])
+                                if re.search(pat, _norm_ar(b) if lang == 'ar' else b)),
+                               len(bk[bnum]))
+                    bk.setdefault(newn, []).extend(bk[bnum][idx:])
+                    bk[bnum] = bk[bnum][:idx]
+            for n in surahs:
+                bl = bk.get(n)
+                if bl:
+                    out.setdefault(n, {'ar': [], 'en': []})[lang] = bl
+            if intro_to is not None and intro:
+                e = out.setdefault(intro_to, {'ar': [], 'en': []})
+                e[lang] = intro + e[lang]
+    return out
+
 def done_set():
     done = set()
     if os.path.exists(f'{ALN}/out/align.json'):
@@ -188,39 +331,69 @@ def align():
 # ---------- assemble ----------
 
 def gather():
+    """Merge durable cache + /tmp out2 results.
+
+    The durable cache can hold older mechanical-fallback entries for surahs
+    that later succeeded in out2. Prefer ok=True over fallback; on ties keep
+    the fresher out2 result (it was aligned against the current block files).
+    """
     merged = {}
     cache = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'alignment-cache', 'merged.json')
     if os.path.exists(cache):
-        return {int(k): v for k, v in json.load(open(cache)).items()}
+        for k, v in json.load(open(cache)).items():
+            merged[int(k)] = v
     if os.path.exists(f'{ALN}/out/align.json'):
         for k, v in json.load(open(f'{ALN}/out/align.json')).items():
             merged[int(k)] = v
     for f in glob.glob(f'{OUT2}/*.json'):
         r = json.load(open(f))
-        cur = merged.get(int(r['n']))
-        if cur is None or (r.get('ok') and not cur.get('ok')):
-            merged[int(r['n'])] = r
+        n = int(r['n']); cur = merged.get(n)
+        if (cur is None or (r.get('ok') and not cur.get('ok'))
+                or bool(r.get('ok')) == bool(cur.get('ok'))):
+            merged[n] = r
     return merged
 
 def assemble():
     AL = gather()
     sj = json.load(open(f'{SITE}/data/surahs.json'))
+    SL = resliced_blocks()
+    REGION = set()
+    for _, _, ss, _, _ in RESLICE:
+        REGION.update(ss)
     surahs = []
     for n in range(1, 115):
         s = sj[n - 1]
-        if s.get('notCovered'):
+        # Surahs inside a re-sliced region that produced no dedicated
+        # section (e.g. part-30 surahs the book never discusses) are not
+        # covered — do not show a neighbouring section's text for them.
+        if s.get('notCovered') or (n in REGION and n not in SL):
             surahs.append({'n': n, 'nameAr': s['nameAr'], 'nameEn': s.get('nameEn', ''),
                            'notCovered': True, 'pairs': []})
             continue
-        arB = load_blocks(n, 'ar'); enB = load_blocks(n, 'en')
+        resliced = n in SL
+        if resliced:
+            arB, enB = SL[n]['ar'], SL[n]['en']
+        else:
+            arB = load_blocks(n, 'ar'); enB = load_blocks(n, 'en')
+            enB = trim_en_blocks(n, enB)
         e = {'n': n, 'nameAr': s['nameAr'], 'nameEn': s.get('nameEn', ''),
              'arOnly': bool(arB) and not enB, 'enOnly': bool(enB) and not arB,
              'pairs': []}
+        if resliced:
+            e['resliced'] = True
         if arB and enB:
-            r = AL.get(n)
-            pairs = r['pairs'] if (r and r.get('ok')) else mech_align(arB, enB)
-            e['aligned'] = bool(r and r.get('ok'))
-            e['fallback'] = not e['aligned']
+            if resliced:
+                # Re-sliced sections have no model alignment; mechanical
+                # pairing is honest and flagged as approximate.
+                pairs = mech_align(arB, enB)
+                e['aligned'] = False; e['fallback'] = True
+            else:
+                r = AL.get(n)
+                ok = bool(r and r.get('ok')
+                          and validate(r['pairs'], len(arB), len(enB)))
+                pairs = r['pairs'] if ok else mech_align(arB, enB)
+                e['aligned'] = ok
+                e['fallback'] = not ok
             for p in pairs:
                 e['pairs'].append({'ar': [arB[i] for i in p['ar']],
                                    'en': [enB[j] for j in p['en']]})
